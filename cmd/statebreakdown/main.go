@@ -40,14 +40,29 @@ func build(shape *shp.Reader, states *[]State) {
 		ps := p.(*shp.Polygon)
 
 		state := State{abbr, ps.NumPoints, ps.NumParts, box.MinX, box.MinY, box.MaxX, box.MaxY, make([]Part, 0)}
-
-		for _, v := range ps.Parts {
-			fmt.Println("Part Index:", v)
-			part := Part{abbr, &state, ps.NumPoints - 2, make([]Tri, 0)}
-			state.Parts = append(state.Parts, part)
+		if abbr == "TX" {
+			var end int32
+			for k, start := range ps.Parts {
+				if int32(k) < ps.NumParts-2 {
+					end = ps.Parts[k+1]
+				} else {
+					end = ps.NumPoints
+				}
+				tris := makeTris(ps, start, end)
+				part := Part{abbr, &state, ps.NumPoints - 2, tris}
+				state.Parts = append(state.Parts, part)
+			}
 		}
 		*states = append(*states, state)
 	}
+}
+
+func makeTris(ps *shp.Polygon, start, end int32) (tris []Tri) {
+	fmt.Printf("Index: %d - Num %d\n", start, end)
+	for i := start; i < end; i++ {
+		fmt.Println(ps.Points[i])
+	}
+	return tris
 }
 
 type Tri struct {
