@@ -55,9 +55,8 @@ func build(shape *shp.Reader, states *[]State) {
 				for i := 0; i < part.R.Len(); i++ {
 					fmt.Println(i)
 					fmt.Println("p: ", points[i].x, points[i].y)
-					fmt.Println(part.R.Value)
-					//fmt.Println("r: ", part.R.Value.(Point).x, part.R.Value.(Point).y)
-					fmt.Println("\n")
+					fmt.Println("r: ", part.R.Value.(Point).x, part.R.Value.(Point).y)
+					fmt.Println("\n ")
 					part.R = part.R.Next()
 					if i > 10 {
 						break
@@ -72,14 +71,14 @@ func build(shape *shp.Reader, states *[]State) {
 
 func (p *Part) makeRing() {
 	fmt.Println(p)
-	for k, _ := range p.Points {
+	for k, v := range p.Points {
 		fmt.Println(k)
 		if p.R.Len() == 0 {
 			p.R = ring.New(1)
-			p.R.Value = k
+			p.R.Value = v
 		} else {
 			r := ring.New(1)
-			r.Value = k
+			r.Value = v
 			p.R.Link(r)
 		}
 		p.R = p.R.Next()
