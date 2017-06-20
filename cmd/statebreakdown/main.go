@@ -52,6 +52,17 @@ func build(shape *shp.Reader, states *[]State) {
 				points := makePoints(ps, start, end)
 				part := Part{abbr, &state, ps.NumPoints - 2, points, nil, ring.New(0)}
 				part.makeRing()
+				for i := 0; i < part.R.Len(); i++ {
+					fmt.Println(i)
+					fmt.Println("p: ", points[i].x, points[i].y)
+					fmt.Println(part.R.Value)
+					//fmt.Println("r: ", part.R.Value.(Point).x, part.R.Value.(Point).y)
+					fmt.Println("\n")
+					part.R = part.R.Next()
+					if i > 10 {
+						break
+					}
+				}
 				state.Parts = append(state.Parts, part)
 			}
 			*states = append(*states, state)
@@ -61,9 +72,19 @@ func build(shape *shp.Reader, states *[]State) {
 
 func (p *Part) makeRing() {
 	fmt.Println(p)
-	for _, v := range p.Tris {
-		fmt.Println(v)
+	for k, _ := range p.Points {
+		fmt.Println(k)
+		if p.R.Len() == 0 {
+			p.R = ring.New(1)
+			p.R.Value = k
+		} else {
+			r := ring.New(1)
+			r.Value = k
+			p.R.Link(r)
+		}
+		p.R = p.R.Next()
 	}
+	p.R = p.R.Next()
 }
 
 func makePoints(ps *shp.Polygon, start, end int32) (points []Point) {
