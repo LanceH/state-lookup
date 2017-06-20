@@ -1,6 +1,7 @@
 package main
 
 import (
+	"container/ring"
 	"fmt"
 
 	shp "github.com/jonas-p/go-shp"
@@ -40,7 +41,7 @@ func build(shape *shp.Reader, states *[]State) {
 		ps := p.(*shp.Polygon)
 
 		state := State{abbr, ps.NumPoints, ps.NumParts, box.MinX, box.MinY, box.MaxX, box.MaxY, make([]Part, 0)}
-		if abbr == "TX" {
+		if abbr == "WY" {
 			var end int32
 			for k, start := range ps.Parts {
 				if int32(k) < ps.NumParts-2 {
@@ -48,23 +49,33 @@ func build(shape *shp.Reader, states *[]State) {
 				} else {
 					end = ps.NumPoints
 				}
-				tris := makeTris(ps, start, end)
-				part := Part{abbr, &state, ps.NumPoints - 2, tris}
+				points := makePoints(ps, start, end)
+				part := Part{abbr, &state, ps.NumPoints - 2, points, nil, ring.New(0)}
+				part.makeRing()
 				state.Parts = append(state.Parts, part)
 			}
+			*states = append(*states, state)
 		}
-		*states = append(*states, state)
 	}
 }
 
-func makeTris(ps *shp.Polygon, start, end int32) (tris []Tri) {
+func (p *Part) makeRing() {
+	fmt.Println(p)
+	for _, v := range p.Tris {
+		fmt.Println(v)
+	}
+}
+
+func makePoints(ps *shp.Polygon, start, end int32) (points []Point) {
 	fmt.Printf("Index: %d - Num %d\n", start, end)
 	for i := start; i < end; i++ {
+		points = append(points, Point{ps.Points[i].X, ps.Points[i].Y})
 		fmt.Println(ps.Points[i])
 	}
-	return tris
+	return points
 }
 
+// Tri is what parts get broken into
 type Tri struct {
 	abbr   string
 	State  *State
@@ -76,6 +87,7 @@ type Tri struct {
 	Points [3]Point
 }
 
+// State is the top level object
 type State struct {
 	abbr      string
 	NumPoints int32
@@ -87,13 +99,17 @@ type State struct {
 	Parts     []Part
 }
 
+// Part is a part of a State
 type Part struct {
 	abbr    string
 	State   *State
 	NumTris int32
+	Points  []Point
 	Tris    []Tri
+	R       *ring.Ring
 }
 
+// Point is a point
 type Point struct {
 	x float64
 	y float64
