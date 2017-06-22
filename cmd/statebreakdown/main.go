@@ -4,6 +4,8 @@ import (
 	"container/ring"
 	"fmt"
 
+	"gitlab.com/LanceH/state-lookup/utilities"
+
 	shp "github.com/jonas-p/go-shp"
 )
 
@@ -52,16 +54,17 @@ func build(shape *shp.Reader, states *[]State) {
 				points := makePoints(ps, start, end)
 				part := Part{abbr, &state, ps.NumPoints - 2, points, nil, ring.New(0)}
 				part.makeRing()
-				for i := 0; i < part.R.Len(); i++ {
-					fmt.Println(i)
-					fmt.Println("p: ", points[i].x, points[i].y)
-					fmt.Println("r: ", part.R.Value.(Point).x, part.R.Value.(Point).y)
-					fmt.Println("\n ")
-					part.R = part.R.Next()
-					if i > 10 {
-						break
-					}
-				}
+				part.makeTri()
+				// for i := 0; i < part.R.Len(); i++ {
+				// 	fmt.Println(i)
+				// 	fmt.Println("p: ", points[i].x, points[i].y)
+				// 	fmt.Println("r: ", part.R.Value.(Point).x, part.R.Value.(Point).y)
+				// 	fmt.Println("\n ")
+				// 	part.R = part.R.Next()
+				// 	if i > 10 {
+				// 		break
+				// 	}
+				// }
 				state.Parts = append(state.Parts, part)
 			}
 			*states = append(*states, state)
@@ -69,10 +72,28 @@ func build(shape *shp.Reader, states *[]State) {
 	}
 }
 
+// This may be destructive to the ring -- TODO make it non-destructive?
+func (p *Part) makeTri() {
+	r := p.R
+	for r.Len() > 3 {
+		if utilities.Convex(r) {
+			if checkEar(r) {
+
+			}
+		}
+		r.Next()
+	}
+}
+
+func checkEar(r *ring.Ring) bool {
+	t := Tri{r.Prev().Value.(Point), r.Value.(Point), r.Next.Value.(Point)}
+	return false
+}
+
 func (p *Part) makeRing() {
-	fmt.Println(p)
-	for k, v := range p.Points {
-		fmt.Println(k)
+	//fmt.Println(p)
+	for _, v := range p.Points {
+		// fmt.Println(k)
 		if p.R.Len() == 0 {
 			p.R = ring.New(1)
 			p.R.Value = v
@@ -90,7 +111,6 @@ func makePoints(ps *shp.Polygon, start, end int32) (points []Point) {
 	fmt.Printf("Index: %d - Num %d\n", start, end)
 	for i := start; i < end; i++ {
 		points = append(points, Point{ps.Points[i].X, ps.Points[i].Y})
-		fmt.Println(ps.Points[i])
 	}
 	return points
 }

@@ -2,6 +2,8 @@ package utilities
 
 import "container/ring"
 
+type Ring *ring.Ring
+
 //InsideTri returns true if point is isn't Tri
 func (t Tri) InsideTri(p Point) bool {
 	c := Cross(t.Points[0], p, t.Points[1])
@@ -30,7 +32,7 @@ func Cross(a, b, c Point) float64 {
 }
 
 //Convex returns true if the polygon is convex at that point in the Ring
-func Convex(r *ring.Ring) bool {
+func (r Ring) Convex() bool {
 	if Cross(r.Prev().Value.(Point), r.Value.(Point), r.Next().Value.(Point)) > 0 {
 		return true
 	}
