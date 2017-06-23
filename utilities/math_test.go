@@ -9,7 +9,7 @@ import (
 var tri = Tri{}
 var inside = Point{1.0, 1.0}
 var outside = Point{5.0, 5.0}
-var points *ring.Ring
+var points Ring
 
 func TestMain(m *testing.M) {
 	fmt.Println("Test Main")
@@ -17,26 +17,26 @@ func TestMain(m *testing.M) {
 }
 
 func TestConvex(t *testing.T) {
-	v := Convex(points)
-	points = points.Next()
+	v := points.Convex()
+	points.Ring = points.Next()
 	if v == false {
 		t.Error("expected false, got ", v)
 	}
 
-	v = Convex(points)
-	points = points.Next()
+	v = points.Convex()
+	points.Ring = points.Next()
 	if v == false {
 		t.Error("expected false, got ", v)
 	}
 
-	v = Convex(points)
-	points = points.Next()
+	v = points.Convex()
+	points.Ring = points.Next()
 	if v == false {
 		t.Error("expected false, got ", v)
 	}
 
-	v = Convex(points)
-	points = points.Next()
+	v = points.Convex()
+	points.Ring = points.Next()
 	if v == true {
 		t.Error("expected false, got ", v)
 	}
@@ -100,21 +100,21 @@ func init() {
 
 	r := ring.New(1)
 	r.Value = p0
-	points = r
+	points.Ring = r
 	points.Value = p0
 
 	r = ring.New(1)
 	r.Value = p1
 	points.Link(r)
-	points = points.Next()
+	points.Ring = points.Next()
 
 	r = ring.New(1)
 	r.Value = p2
 	points.Link(r)
-	points = points.Next()
+	points.Ring = points.Next()
 
 	r = ring.New(1)
 	r.Value = p3
 	points.Link(r)
-	points = points.Move(2)
+	points.Ring = points.Move(2)
 }
