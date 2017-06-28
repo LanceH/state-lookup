@@ -24,7 +24,7 @@ func (t Tri) InsideTri(p Point) bool {
 	case c == 0:
 		return true
 	}
-	return true
+	return false
 }
 
 //Cross returns a cross product of two points
@@ -34,7 +34,8 @@ func Cross(a, b, c Point) float64 {
 
 //Convex returns true if the polygon is convex at that point in the Ring
 func (r *Ring) Convex() bool {
-	if Cross(r.Prev().Value.(Point), r.Value.(Point), r.Next().Value.(Point)) > 0 {
+	//fmt.Println("Cross: ", Cross(r.Prev().Value.(Point), r.Value.(Point), r.Next().Value.(Point)))
+	if Cross(r.Prev().Value.(Point), r.Value.(Point), r.Next().Value.(Point)) >= 0 {
 		return true
 	}
 	return false
@@ -63,6 +64,8 @@ func (p *Part) MakeTri() {
 	r := p.R
 	var t Tri
 	for r.Len() > 3 {
+		fmt.Println(r.Len(), r.Value.(Point), r.Convex(), Cross(r.Prev().Value.(Point), r.Value.(Point), r.Next().Value.(Point)))
+		fmt.Println(r.Len())
 		if r.Convex() {
 			if r.checkEar() {
 				t = Tri{Abbr: p.Abbr, State: p.State, Part: p, Points: [3]Point{r.Prev().Value.(Point), r.Value.(Point), r.Next().Value.(Point)}}
@@ -104,7 +107,6 @@ func (t *Tri) SetBounds() {
 
 func (r Ring) checkEar() bool {
 	t := Tri{Points: [3]Point{r.Prev().Value.(Point), r.Value.(Point), r.Next().Value.(Point)}}
-	fmt.Println("Checking: ", t)
 	var q Ring
 	q.Ring = r.Move(2)
 	for i := 0; i < q.Len()-3; i++ {
