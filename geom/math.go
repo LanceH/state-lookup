@@ -61,17 +61,45 @@ func (p *Part) MakeRing() {
 // MakeTri is destructive to the ring
 func (p *Part) MakeTri() {
 	r := p.R
+	var t Tri
 	for r.Len() > 3 {
 		if r.Convex() {
 			if r.checkEar() {
-				p.Tris = append(p.Tris, Tri{Points: [3]Point{r.Prev().Value.(Point), r.Value.(Point), r.Next().Value.(Point)}})
+				t = Tri{Abbr: p.Abbr, State: p.State, Part: p, Points: [3]Point{r.Prev().Value.(Point), r.Value.(Point), r.Next().Value.(Point)}}
+				t.SetBounds()
+				p.Tris = append(p.Tris, t)
 				r.Ring = r.Prev()
 				r.Unlink(1)
+				r.Ring = r.Next()
 			}
 		}
 		r.Ring = r.Next()
 	}
-	p.Tris = append(p.Tris, Tri{Points: [3]Point{r.Prev().Value.(Point), r.Value.(Point), r.Next().Value.(Point)}})
+	t = Tri{Abbr: p.Abbr, State: p.State, Part: p, Points: [3]Point{r.Prev().Value.(Point), r.Value.(Point), r.Next().Value.(Point)}}
+	t.SetBounds()
+	p.Tris = append(p.Tris, t)
+}
+
+func (t *Tri) SetBounds() {
+	t.MinX = t.Points[0].X
+	t.MaxX = t.Points[0].X
+	t.MinY = t.Points[0].Y
+	t.MaxY = t.Points[0].Y
+
+	for i := 1; i < 2; i++ {
+		if t.Points[i].X < t.MinX {
+			t.MinX = t.Points[i].X
+		}
+		if t.Points[i].X > t.MinX {
+			t.MinX = t.Points[i].X
+		}
+		if t.Points[i].Y < t.MinY {
+			t.MinY = t.Points[i].Y
+		}
+		if t.Points[i].Y > t.MinY {
+			t.MinY = t.Points[i].Y
+		}
+	}
 }
 
 func (r Ring) checkEar() bool {
