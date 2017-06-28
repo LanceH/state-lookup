@@ -4,13 +4,13 @@ import (
 	"container/ring"
 	"fmt"
 
-	"gitlab.com/LanceH/state-lookup/utilities"
+	"gitlab.com/LanceH/state-lookup/geom"
 
 	shp "github.com/jonas-p/go-shp"
 )
 
 var shapeFile = "../../data/cb_2013_us_state_500k.shp"
-var states []State
+var states []geom.State
 var numStates int
 
 func main() {
@@ -29,11 +29,11 @@ func main() {
 
 	fmt.Println("States:")
 	for _, v := range states {
-		fmt.Println(v.abbr)
+		fmt.Println(v.Abbr)
 	}
 }
 
-func build(shape *shp.Reader, states *[]State) {
+func build(shape *shp.Reader, states *[]geom.State) {
 	fmt.Println(states)
 	for shape.Next() {
 		n, p := shape.Shape()
@@ -42,7 +42,7 @@ func build(shape *shp.Reader, states *[]State) {
 
 		ps := p.(*shp.Polygon)
 
-		state := State{abbr, ps.NumPoints, ps.NumParts, box.MinX, box.MinY, box.MaxX, box.MaxY, make([]Part, 0)}
+		state := geom.State{abbr, ps.NumPoints, ps.NumParts, box.MinX, box.MinY, box.MaxX, box.MaxY, make([]geom.Part, 0)}
 		if abbr == "WY" {
 			var end int32
 			for k, start := range ps.Parts {
@@ -52,19 +52,15 @@ func build(shape *shp.Reader, states *[]State) {
 					end = ps.NumPoints
 				}
 				points := makePoints(ps, start, end)
-				part := Part{abbr, &state, ps.NumPoints - 2, points, nil, ring.New(0)}
-				part.makeRing()
-				part.makeTri()
-				// for i := 0; i < part.R.Len(); i++ {
-				// 	fmt.Println(i)
-				// 	fmt.Println("p: ", points[i].x, points[i].y)
-				// 	fmt.Println("r: ", part.R.Value.(Point).x, part.R.Value.(Point).y)
-				// 	fmt.Println("\n ")
-				// 	part.R = part.R.Next()
-				// 	if i > 10 {
-				// 		break
-				// 	}
-				// }
+				part := geom.Part{abbr, &state, ps.NumPoints - 2, points, nil, geom.Ring{ring.New(0)}}
+				fmt.Println("Making Ring...")
+				part.MakeRing()
+				fmt.Println("Making Triangles...")
+				part.MakeTri()
+				fmt.Println("Triangles: ", len(part.Tris))
+				for k, v := range part.Tris {
+					fmt.Println(k, v)
+				}
 				state.Parts = append(state.Parts, part)
 			}
 			*states = append(*states, state)
@@ -72,45 +68,10 @@ func build(shape *shp.Reader, states *[]State) {
 	}
 }
 
-// This may be destructive to the ring -- TODO make it non-destructive?
-func (p *Part) makeTri() {
-	r := p.R
-	for r.Len() > 3 {
-		if utilities.Convex(r) {
-			if checkEar(r) {
-
-			}
-		}
-		r.Next()
-	}
-}
-
-func checkEar(r *ring.Ring) bool {
-	t := Tri{r.Prev().Value.(Point), r.Value.(Point), r.Next.Value.(Point)}
-	return false
-}
-
-func (p *Part) makeRing() {
-	//fmt.Println(p)
-	for _, v := range p.Points {
-		// fmt.Println(k)
-		if p.R.Len() == 0 {
-			p.R = ring.New(1)
-			p.R.Value = v
-		} else {
-			r := ring.New(1)
-			r.Value = v
-			p.R.Link(r)
-		}
-		p.R = p.R.Next()
-	}
-	p.R = p.R.Next()
-}
-
-func makePoints(ps *shp.Polygon, start, end int32) (points []Point) {
+func makePoints(ps *shp.Polygon, start, end int32) (points []geom.Point) {
 	fmt.Printf("Index: %d - Num %d\n", start, end)
 	for i := start; i < end; i++ {
-		points = append(points, Point{ps.Points[i].X, ps.Points[i].Y})
+		points = append(points, geom.Point{ps.Points[i].X, ps.Points[i].Y})
 	}
 	return points
 }
