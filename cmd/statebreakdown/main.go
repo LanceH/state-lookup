@@ -42,8 +42,9 @@ func build(shape *shp.Reader, states *[]geom.State) {
 
 		ps := p.(*shp.Polygon)
 
-		state := geom.State{abbr, ps.NumPoints, ps.NumParts, box.MinX, box.MinY, box.MaxX, box.MaxY, make([]geom.Part, 0)}
-		if abbr == "TX" {
+		state := geom.State{Abbr: abbr, NumPoints: ps.NumPoints, NumParts: ps.NumParts, MinX: box.MinX, MinY: box.MinY, MaxX: box.MaxX, MaxY: box.MaxY, Parts: make([]geom.Part, 0)}
+		if abbr != "XX" {
+			fmt.Println("\n\nState:", abbr)
 			var end int32
 			for k, v := range ps.Parts {
 				fmt.Println(k, v)
@@ -58,20 +59,20 @@ func build(shape *shp.Reader, states *[]geom.State) {
 				part := geom.Part{Abbr: abbr, State: &state, NumTris: ps.NumPoints - 2, Points: points, Tris: nil, R: geom.Ring{Ring: ring.New(0)}}
 				fmt.Println("Making Ring...")
 				part.MakeRing()
-				for k, v := range points {
-					fmt.Println(k, v)
-				}
+				// for k, v := range points {
+				// 	fmt.Println(k, v)
+				// }
 				fmt.Println(part.R.Len())
-				for i := 0; i < part.R.Len(); i++ {
-					fmt.Print(part.R.Value.(geom.Point).X, ",")
-					part.R = geom.Ring{part.R.Next()}
-				}
-				fmt.Println("\n\ny")
-				fmt.Println(part.R.Len())
-				for i := 0; i < part.R.Len(); i++ {
-					fmt.Print(part.R.Value.(geom.Point).Y, ",")
-					part.R = geom.Ring{part.R.Next()}
-				}
+				// for i := 0; i < part.R.Len(); i++ {
+				// 	fmt.Print(part.R.Value.(geom.Point).X, ",")
+				// 	part.R = geom.Ring{Ring: part.R.Next()}
+				// }
+				// fmt.Println("\n\ny")
+				// fmt.Println(part.R.Len())
+				// for i := 0; i < part.R.Len(); i++ {
+				// 	fmt.Print(part.R.Value.(geom.Point).Y, ",")
+				// 	part.R = geom.Ring{Ring: part.R.Next()}
+				// }
 				//os.Exit(0)
 				fmt.Println("Making Triangles...")
 				part.MakeTri()
@@ -89,16 +90,7 @@ func makePoints(ps *shp.Polygon, start, end int32) (points []geom.Point) {
 	fmt.Printf("Index: %d - Num %d\n", start, end)
 	for i := start; i < end; i++ {
 		points = append(points, geom.Point{X: ps.Points[i].X, Y: ps.Points[i].Y})
-		// fmt.Print("(", ps.Points[i].X, ",", ps.Points[i].Y, ")\n")
 	}
-	// for _, v := range points {
-	// 	fmt.Print(v.X, ",")
-	// }
-	// fmt.Println("")
-	// for _, v := range points {
-	// 	fmt.Print(v.Y, ",")
-	// }
-	//os.Exit(0)
 	return points
 }
 

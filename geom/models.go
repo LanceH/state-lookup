@@ -24,10 +24,10 @@ type State struct {
 	Abbr      string
 	NumPoints int32
 	NumParts  int32
-	X1        float64
-	Y1        float64
-	X2        float64
-	Y2        float64
+	MinX      float64
+	MinY      float64
+	MaxX      float64
+	MaxY      float64
 	Parts     []Part
 }
 
