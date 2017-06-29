@@ -22,7 +22,7 @@ func (t Tri) InsideTri(p Point) bool {
 		}
 		return false
 	case c == 0:
-		return true
+		return false
 	}
 	return false
 }
@@ -74,6 +74,9 @@ func (p *Part) MakeTri() {
 			}
 		}
 		r.Ring = r.Next()
+		if r.Len() == 24 {
+			r.LogPlot()
+		}
 	}
 	t = Tri{Abbr: p.Abbr, State: p.State, Part: p, Points: [3]Point{r.Prev().Value.(Point), r.Value.(Point), r.Next().Value.(Point)}}
 	t.SetBounds()
@@ -105,6 +108,9 @@ func (t *Tri) SetBounds() {
 
 func (r Ring) checkEar() bool {
 	t := Tri{Points: [3]Point{r.Prev().Value.(Point), r.Value.(Point), r.Next().Value.(Point)}}
+	if Cross(t.Points[0], t.Points[1], t.Points[2]) == 0 {
+		return true
+	}
 	var q Ring
 	q.Ring = r.Move(2)
 	for q.Ring != r.Prev() {

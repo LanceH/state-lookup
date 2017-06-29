@@ -43,7 +43,7 @@ func build(shape *shp.Reader, states *[]geom.State) {
 		ps := p.(*shp.Polygon)
 
 		state := geom.State{Abbr: abbr, NumPoints: ps.NumPoints, NumParts: ps.NumParts, MinX: box.MinX, MinY: box.MinY, MaxX: box.MaxX, MaxY: box.MaxY, Parts: make([]geom.Part, 0)}
-		if abbr != "XX" {
+		if abbr == "FL" {
 			fmt.Println("\n\nState:", abbr)
 			var end int32
 			for k, v := range ps.Parts {
@@ -59,10 +59,10 @@ func build(shape *shp.Reader, states *[]geom.State) {
 				part := geom.Part{Abbr: abbr, State: &state, NumTris: ps.NumPoints - 2, Points: points, Tris: nil, R: geom.Ring{Ring: ring.New(0)}}
 				fmt.Println("Making Ring...")
 				part.MakeRing()
+				fmt.Println(part.R.Len())
 				// for k, v := range points {
 				// 	fmt.Println(k, v)
 				// }
-				fmt.Println(part.R.Len())
 				// for i := 0; i < part.R.Len(); i++ {
 				// 	fmt.Print(part.R.Value.(geom.Point).X, ",")
 				// 	part.R = geom.Ring{Ring: part.R.Next()}
