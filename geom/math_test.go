@@ -16,26 +16,38 @@ func TestMain(m *testing.M) {
 	m.Run()
 }
 
+func TestTexas(t *testing.T) {
+	v := Cross(Point{-97.214885, 27.89744}, Point{-97.13247, 27.89777}, Point{-97.13014, 27.89752})
+	fmt.Println(v)
+	if v <= 0 {
+		t.Error("expected > 0, got ", v)
+	}
+}
+
 func TestConvex(t *testing.T) {
 	v := points.Convex()
+	fmt.Println(points.Ring.Value.(Point))
 	points.Ring = points.Next()
-	if v == false {
-		t.Error("expected false, got ", v)
+	if v != true {
+		t.Error("expected true, got ", v)
 	}
 
 	v = points.Convex()
+	fmt.Println(points.Ring.Value.(Point))
 	points.Ring = points.Next()
 	if v == false {
-		t.Error("expected false, got ", v)
+		t.Error("expected true, got ", v)
 	}
 
 	v = points.Convex()
+	fmt.Println(points.Ring.Value.(Point))
 	points.Ring = points.Next()
 	if v == false {
-		t.Error("expected false, got ", v)
+		t.Error("expected true, got ", v)
 	}
 
 	v = points.Convex()
+	fmt.Println(points.Ring.Value.(Point))
 	points.Ring = points.Next()
 	if v == true {
 		t.Error("expected false, got ", v)
@@ -93,10 +105,10 @@ func init() {
 	tri.Points[1] = Point{0.0, 4.0}
 	tri.Points[2] = Point{3.0, 0.0}
 
-	p0 := Point{0, 0}
-	p1 := Point{1, 4}
-	p2 := Point{2, 0}
-	p3 := Point{1, 1}
+	p0 := Point{0.0, 0.0}
+	p1 := Point{1.0, 4.0}
+	p2 := Point{2.0, 0.0}
+	p3 := Point{1.0, 1.0}
 
 	r := ring.New(1)
 	r.Value = p0
