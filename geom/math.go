@@ -3,10 +3,9 @@ package geom
 import (
 	"container/ring"
 	"fmt"
-	"os"
 )
 
-//InsideTri returns true if point is isn't Tri
+//InsideTri returns true if point is inside Tri
 func (t Tri) InsideTri(p Point) bool {
 	c := Cross(t.Points[0], p, t.Points[1])
 	switch {
@@ -23,7 +22,7 @@ func (t Tri) InsideTri(p Point) bool {
 		}
 		return false
 	case c == 0:
-		return false
+		return true
 	}
 	return false
 }
@@ -67,19 +66,45 @@ func (p *Part) MakeTri() {
 	fmt.Println("Ring: ", r.Len())
 	var t Tri
 	for r.Len() > 3 {
-		if p.NumTris > 200 && r.Len() == 28 {
-			fmt.Println(r.Len())
-			for i := 0; i < r.Len(); i++ {
-				fmt.Print(r.Value.(Point).X, ",")
-				r = Ring{r.Next()}
-			}
-			fmt.Println("\n\ny")
-			for i := 0; i < r.Len(); i++ {
-				fmt.Print(r.Value.(Point).Y, ",")
-				r = Ring{r.Next()}
-			}
-			os.Exit(0)
-		}
+		// if r.Len() == 28 {
+		// 	xmin := p.Tris[0].Points[0].X
+		// 	xmax := p.Tris[0].Points[0].X
+		// 	ymin := p.Tris[0].Points[0].Y
+		// 	ymax := p.Tris[0].Points[0].Y
+		// 	fmt.Println("plot.new()")
+		// 	for _, v := range p.Tris {
+		// 		if v.Points[0].X < xmin {
+		// 			xmin = v.Points[0].X
+		// 		}
+		// 		if v.Points[0].X > xmax {
+		// 			xmax = v.Points[0].X
+		// 		}
+		// 		if v.Points[0].Y < ymin {
+		// 			ymin = v.Points[0].Y
+		// 		}
+		// 		if v.Points[0].Y > ymax {
+		// 			ymax = v.Points[0].Y
+		// 		}
+		// 		fmt.Printf("x2 <- c(%f,%f,%f,%f)\n", v.Points[0].X, v.Points[1].X, v.Points[2].X, v.Points[0].X)
+		// 		fmt.Printf("y2 <- c(%f,%f,%f,%f)\n", v.Points[0].Y, v.Points[1].Y, v.Points[2].Y, v.Points[0].Y)
+		// 		fmt.Printf("lines(x2,y2)\n")
+		// 	}
+		// 	fmt.Printf("plot(1,1,xlim=c(%f,%f), ylim=c(%f,%f))\n", xmin, xmax, ymin, ymax)
+		// 	// fmt.Println("Tris: ", r.Len())
+		// 	// fmt.Println(r.Len())
+		// 	// fmt.Println("x")
+		// 	// for i := 0; i < r.Len(); i++ {
+		// 	// 	fmt.Print(r.Value.(Point).X, ",")
+		// 	// 	r = Ring{r.Next()}
+		// 	// }
+		// 	// fmt.Println("\n\ny")
+		// 	// for i := 0; i < r.Len(); i++ {
+		// 	// 	fmt.Print(r.Value.(Point).Y, ",")
+		// 	// 	r = Ring{r.Next()}
+		// 	// }
+		// 	// fmt.Println("")
+		// 	//os.Exit(0)
+		// }
 		//fmt.Println(r.Len(), r.Prev().Value.(Point), r.Value.(Point), r.Next().Value.(Point), r.Convex(), Cross(r.Prev().Value.(Point), r.Value.(Point), r.Next().Value.(Point)))
 		//fmt.Println(r.Len())
 		if r.Convex() {
@@ -87,9 +112,12 @@ func (p *Part) MakeTri() {
 				t = Tri{Abbr: p.Abbr, State: p.State, Part: p, Points: [3]Point{r.Prev().Value.(Point), r.Value.(Point), r.Next().Value.(Point)}}
 				t.SetBounds()
 				p.Tris = append(p.Tris, t)
+				//fmt.Println("\nTesting  ", r.Value.(Point))
 				r.Ring = r.Prev()
 				r.Unlink(1)
+				//fmt.Println("Removing ", a.Value.(Point))
 				r.Ring = r.Next()
+				fmt.Println("Length Remaining: ", r.Len())
 			}
 		}
 		r.Ring = r.Next()
@@ -127,8 +155,10 @@ func (r Ring) checkEar() bool {
 	q.Ring = r.Move(2)
 	for i := 0; i < q.Len()-3; i++ {
 		if t.InsideTri(q.Ring.Value.(Point)) {
+			fmt.Println("point inside tri")
 			return false
 		}
+		q.Ring = q.Next()
 	}
 	return true
 }

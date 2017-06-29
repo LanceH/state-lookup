@@ -18,7 +18,6 @@ func TestMain(m *testing.M) {
 
 func TestTexas(t *testing.T) {
 	v := Cross(Point{-97.214885, 27.89744}, Point{-97.13247, 27.89777}, Point{-97.13014, 27.89752})
-	fmt.Println(v)
 	if v <= 0 {
 		t.Error("expected > 0, got ", v)
 	}
@@ -26,28 +25,24 @@ func TestTexas(t *testing.T) {
 
 func TestConvex(t *testing.T) {
 	v := points.Convex()
-	fmt.Println(points.Ring.Value.(Point))
 	points.Ring = points.Next()
 	if v != true {
 		t.Error("expected true, got ", v)
 	}
 
 	v = points.Convex()
-	fmt.Println(points.Ring.Value.(Point))
 	points.Ring = points.Next()
 	if v == false {
 		t.Error("expected true, got ", v)
 	}
 
 	v = points.Convex()
-	fmt.Println(points.Ring.Value.(Point))
 	points.Ring = points.Next()
 	if v == false {
 		t.Error("expected true, got ", v)
 	}
 
 	v = points.Convex()
-	fmt.Println(points.Ring.Value.(Point))
 	points.Ring = points.Next()
 	if v == true {
 		t.Error("expected false, got ", v)
