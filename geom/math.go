@@ -10,14 +10,14 @@ func (t Tri) InsideTri(p Point) bool {
 	c := Cross(t.Points[0], p, t.Points[1])
 	switch {
 	case c > 0.0:
-		if (Cross(t.Points[1], p, t.Points[2]) > 0.0) &&
-			(Cross(t.Points[2], p, t.Points[0]) > 0.0) {
+		if (Cross(t.Points[1], p, t.Points[2]) >= 0.0) &&
+			(Cross(t.Points[2], p, t.Points[0]) >= 0.0) {
 			return true
 		}
 		return false
 	case c < 0.0:
-		if (Cross(t.Points[1], p, t.Points[2]) < 0.0) &&
-			(Cross(t.Points[2], p, t.Points[0]) < 0.0) {
+		if (Cross(t.Points[1], p, t.Points[2]) <= 0.0) &&
+			(Cross(t.Points[2], p, t.Points[0]) <= 0.0) {
 			return true
 		}
 		return false
@@ -74,9 +74,6 @@ func (p *Part) MakeTri() {
 			}
 		}
 		r.Ring = r.Next()
-		if r.Len() == 24 {
-			r.LogPlot()
-		}
 	}
 	t = Tri{Abbr: p.Abbr, State: p.State, Part: p, Points: [3]Point{r.Prev().Value.(Point), r.Value.(Point), r.Next().Value.(Point)}}
 	t.SetBounds()
@@ -115,8 +112,6 @@ func (r Ring) checkEar() bool {
 	q.Ring = r.Move(2)
 	for q.Ring != r.Prev() {
 		if t.InsideTri(q.Ring.Value.(Point)) {
-			//fmt.Println("point inside tri")
-			//r.LogPlot()
 			return false
 		}
 		q.Ring = q.Next()

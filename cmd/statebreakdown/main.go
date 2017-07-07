@@ -43,7 +43,7 @@ func build(shape *shp.Reader, states *[]geom.State) {
 		ps := p.(*shp.Polygon)
 
 		state := geom.State{Abbr: abbr, NumPoints: ps.NumPoints, NumParts: ps.NumParts, MinX: box.MinX, MinY: box.MinY, MaxX: box.MaxX, MaxY: box.MaxY, Parts: make([]geom.Part, 0)}
-		if abbr == "FL" {
+		if abbr != "CT" && abbr != "PR" && abbr != "DE" {
 			fmt.Println("\n\nState:", abbr)
 			var end int32
 			for k, v := range ps.Parts {
