@@ -5,27 +5,38 @@ import (
 	"fmt"
 )
 
-//InsideTri returns true if point is inside Tri
+//InsideTri should work this time
 func (t Tri) InsideTri(p Point) bool {
-	c := Cross(t.Points[0], p, t.Points[1])
-	switch {
-	case c > 0.0:
-		if (Cross(t.Points[1], p, t.Points[2]) >= 0.0) &&
-			(Cross(t.Points[2], p, t.Points[0]) >= 0.0) {
-			return true
-		}
-		return false
-	case c < 0.0:
-		if (Cross(t.Points[1], p, t.Points[2]) <= 0.0) &&
-			(Cross(t.Points[2], p, t.Points[0]) <= 0.0) {
-			return true
-		}
-		return false
-	case c == 0:
-		return false
+	a := Cross(t.Points[0], t.Points[1], p)
+	b := Cross(t.Points[1], t.Points[2], p)
+	c := Cross(t.Points[2], t.Points[0], p)
+	if a > 0 && b > 0 && c > 0 {
+		return true
 	}
 	return false
 }
+
+//InsideTri returns true if point is inside Tri
+// func (t Tri) InsideTri(p Point) bool {
+// 	c := Cross(t.Points[0], p, t.Points[1])
+// 	switch {
+// 	case c > 0.0:
+// 		if (Cross(t.Points[1], p, t.Points[2]) >= 0.0) &&
+// 			(Cross(t.Points[2], p, t.Points[0]) >= 0.0) {
+// 			return true
+// 		}
+// 		return false
+// 	case c < 0.0:
+// 		if (Cross(t.Points[1], p, t.Points[2]) <= 0.0) &&
+// 			(Cross(t.Points[2], p, t.Points[0]) <= 0.0) {
+// 			return true
+// 		}
+// 		return false
+// 	case c == 0:
+// 		return false
+// 	}
+// 	return false
+// }
 
 //Cross returns a cross product of two points
 func Cross(a, b, c Point) float64 {
@@ -34,7 +45,15 @@ func Cross(a, b, c Point) float64 {
 
 //Convex returns true if the polygon is convex at that point in the Ring
 func (r *Ring) Convex() bool {
-	if Cross(r.Prev().Value.(Point), r.Value.(Point), r.Next().Value.(Point)) >= 0 {
+	if Cross(r.Prev().Value.(Point), r.Value.(Point), r.Next().Value.(Point)) > 0 {
+		return true
+	}
+	return false
+}
+
+//Straight returns true if the polygon is straight at that point in the Ring
+func (r *Ring) Straight() bool {
+	if Cross(r.Prev().Value.(Point), r.Value.(Point), r.Next().Value.(Point)) == 0 {
 		return true
 	}
 	return false
@@ -105,9 +124,6 @@ func (t *Tri) SetBounds() {
 
 func (r Ring) checkEar() bool {
 	t := Tri{Points: [3]Point{r.Prev().Value.(Point), r.Value.(Point), r.Next().Value.(Point)}}
-	if Cross(t.Points[0], t.Points[1], t.Points[2]) == 0 {
-		return true
-	}
 	var q Ring
 	q.Ring = r.Move(2)
 	for q.Ring != r.Prev() {
