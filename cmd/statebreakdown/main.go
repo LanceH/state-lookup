@@ -43,19 +43,28 @@ func build(shape *shp.Reader, states *[]geom.State) {
 		ps := p.(*shp.Polygon)
 
 		state := geom.State{Abbr: abbr, NumPoints: ps.NumPoints, NumParts: ps.NumParts, MinX: box.MinX, MinY: box.MinY, MaxX: box.MaxX, MaxY: box.MaxY, Parts: make([]geom.Part, 0)}
-		if abbr != "CT" && abbr != "PR" && abbr != "DE" {
+		if abbr != "XX" {
 			fmt.Println("\n\nState:", abbr)
 			var end int32
 			for k, v := range ps.Parts {
 				fmt.Println(k, v)
 			}
 			for k, start := range ps.Parts {
-				if int32(k) < ps.NumParts-2 {
+				if int32(k) < ps.NumParts-1 {
 					end = ps.Parts[k+1] - 1
 				} else {
 					end = ps.NumPoints - 1
 				}
 				points := makePoints(ps, start, end)
+				// for _, p := range points {
+				// 	//fmt.Printf("p.Points = append(p.Points, Point{%f, %f})\n", p.X, p.Y)
+				// 	//fmt.Printf("%f,", p.X)
+				// }
+				// fmt.Println("")
+				// for _, p := range points {
+				// 	//fmt.Printf("p.Points = append(p.Points, Point{%f, %f})\n", p.X, p.Y)
+				// 	//fmt.Printf("%f,", p.Y)
+				// }
 				part := geom.Part{Abbr: abbr, State: &state, NumTris: ps.NumPoints - 2, Points: points, Tris: nil, R: geom.Ring{Ring: ring.New(0)}}
 				fmt.Println("Making Ring...")
 				part.MakeRing()
