@@ -13,7 +13,7 @@ import (
 )
 
 var shapeFile = "../../data/cb_2013_us_state_500k.shp"
-var states []geom.State
+var states = make(map[string]geom.State)
 var numStates int
 
 func main() {
@@ -28,7 +28,7 @@ func main() {
 	numStates = shape.AttributeCount()
 
 	fmt.Printf("Processing %d states\n", numStates)
-	build(shape, &states)
+	build(shape, states)
 
 	fmt.Println("States:")
 	for _, v := range states {
@@ -36,7 +36,7 @@ func main() {
 	}
 }
 
-func build(shape *shp.Reader, states *[]geom.State) {
+func build(shape *shp.Reader, states map[string]geom.State) {
 	fmt.Println(states)
 	for shape.Next() {
 		n, p := shape.Shape()
@@ -69,10 +69,11 @@ func build(shape *shp.Reader, states *[]geom.State) {
 				state.Parts = append(state.Parts, part)
 				fmt.Println("Added Part")
 			}
-			*states = append(*states, state)
+			//*states = append(*states, state)
+			states[abbr] = state
 		}
 	}
-	s, _ := json.MarshalIndent(*states, "", "  ")
+	s, _ := json.MarshalIndent(states, "", "  ")
 	err := ioutil.WriteFile("../../data/states.json", s, 0644)
 	if err != nil {
 		log.Panic(err)
