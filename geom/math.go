@@ -16,28 +16,6 @@ func (t Tri) InsideTri(p Point) bool {
 	return false
 }
 
-//InsideTri returns true if point is inside Tri
-// func (t Tri) InsideTri(p Point) bool {
-// 	c := Cross(t.Points[0], p, t.Points[1])
-// 	switch {
-// 	case c > 0.0:
-// 		if (Cross(t.Points[1], p, t.Points[2]) >= 0.0) &&
-// 			(Cross(t.Points[2], p, t.Points[0]) >= 0.0) {
-// 			return true
-// 		}
-// 		return false
-// 	case c < 0.0:
-// 		if (Cross(t.Points[1], p, t.Points[2]) <= 0.0) &&
-// 			(Cross(t.Points[2], p, t.Points[0]) <= 0.0) {
-// 			return true
-// 		}
-// 		return false
-// 	case c == 0:
-// 		return false
-// 	}
-// 	return false
-// }
-
 //Cross returns a cross product of two points
 func Cross(a, b, c Point) float64 {
 	return (a.X-b.X)*(c.Y-b.Y) - (a.Y-b.Y)*(c.X-b.X)

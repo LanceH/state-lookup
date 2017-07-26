@@ -36,7 +36,7 @@ type Part struct {
 	Abbr    string
 	State   *State `json:"-"`
 	NumTris int32
-	Points  []Point
+	Points  []Point `json:"-"`
 	Tris    []Tri
 	R       Ring `json:"-"`
 }
