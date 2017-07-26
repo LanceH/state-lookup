@@ -2,7 +2,10 @@ package main
 
 import (
 	"container/ring"
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
+	"log"
 
 	"gitlab.com/LanceH/state-lookup/geom"
 
@@ -56,42 +59,23 @@ func build(shape *shp.Reader, states *[]geom.State) {
 					end = ps.NumPoints - 1
 				}
 				points := makePoints(ps, start, end)
-				// for _, p := range points {
-				// 	//fmt.Printf("p.Points = append(p.Points, Point{%f, %f})\n", p.X, p.Y)
-				// 	//fmt.Printf("%f,", p.X)
-				// }
-				// fmt.Println("")
-				// for _, p := range points {
-				// 	//fmt.Printf("p.Points = append(p.Points, Point{%f, %f})\n", p.X, p.Y)
-				// 	//fmt.Printf("%f,", p.Y)
-				// }
 				part := geom.Part{Abbr: abbr, State: &state, NumTris: ps.NumPoints - 2, Points: points, Tris: nil, R: geom.Ring{Ring: ring.New(0)}}
 				fmt.Println("Making Ring...")
 				part.MakeRing()
 				fmt.Println(part.R.Len())
-				// for k, v := range points {
-				// 	fmt.Println(k, v)
-				// }
-				// for i := 0; i < part.R.Len(); i++ {
-				// 	fmt.Print(part.R.Value.(geom.Point).X, ",")
-				// 	part.R = geom.Ring{Ring: part.R.Next()}
-				// }
-				// fmt.Println("\n\ny")
-				// fmt.Println(part.R.Len())
-				// for i := 0; i < part.R.Len(); i++ {
-				// 	fmt.Print(part.R.Value.(geom.Point).Y, ",")
-				// 	part.R = geom.Ring{Ring: part.R.Next()}
-				// }
-				//os.Exit(0)
 				fmt.Println("Making Triangles...")
 				part.MakeTri()
 				fmt.Println("Triangles: ", len(part.Tris))
 				state.Parts = append(state.Parts, part)
 				fmt.Println("Added Part")
-				//os.Exit(0)
 			}
 			*states = append(*states, state)
 		}
+	}
+	s, _ := json.MarshalIndent(*states, "", "  ")
+	err := ioutil.WriteFile("../../data/states.json", s, 0644)
+	if err != nil {
+		log.Panic(err)
 	}
 }
 
@@ -101,44 +85,4 @@ func makePoints(ps *shp.Polygon, start, end int32) (points []geom.Point) {
 		points = append(points, geom.Point{X: ps.Points[i].X, Y: ps.Points[i].Y})
 	}
 	return points
-}
-
-// Tri is what parts get broken into
-type Tri struct {
-	abbr   string
-	State  *State
-	Part   *Part
-	MinX   float64
-	MinY   float64
-	MaxX   float64
-	MaxY   float64
-	Points [3]Point
-}
-
-// State is the top level object
-type State struct {
-	abbr      string
-	NumPoints int32
-	NumParts  int32
-	x1        float64
-	y1        float64
-	x2        float64
-	y2        float64
-	Parts     []Part
-}
-
-// Part is a part of a State
-type Part struct {
-	abbr    string
-	State   *State
-	NumTris int32
-	Points  []Point
-	Tris    []Tri
-	R       *ring.Ring
-}
-
-// Point is a point
-type Point struct {
-	x float64
-	y float64
 }

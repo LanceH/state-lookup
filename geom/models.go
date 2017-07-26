@@ -10,8 +10,8 @@ type Ring struct {
 // Tri is what parts get broken into
 type Tri struct {
 	Abbr   string
-	State  *State
-	Part   *Part
+	State  *State `json:"-"`
+	Part   *Part  `json:"-"`
 	MinX   float64
 	MinY   float64
 	MaxX   float64
@@ -34,11 +34,11 @@ type State struct {
 // Part is a part of a State
 type Part struct {
 	Abbr    string
-	State   *State
+	State   *State `json:"-"`
 	NumTris int32
 	Points  []Point
 	Tris    []Tri
-	R       Ring
+	R       Ring `json:"-"`
 }
 
 // Point is a point
