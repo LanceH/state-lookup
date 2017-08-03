@@ -2,7 +2,10 @@ package geom
 
 import (
 	"container/ring"
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
+	"log"
 	"testing"
 )
 
@@ -124,4 +127,15 @@ func init() {
 	r.Value = p3
 	points.Link(r)
 	points.Ring = points.Move(2)
+
+	// used in lookup_test.go
+
+	b, err := ioutil.ReadFile("../data/states.json")
+	if err != nil {
+		log.Panic(err)
+	}
+	err = json.Unmarshal(b, &states)
+	if err != nil {
+		log.Panic(err)
+	}
 }
