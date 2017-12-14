@@ -4,7 +4,7 @@ This contains two programs.  One to breakdown a shapefile of the US into triangl
 
 # Installation
 
-`go get gitlab.com/LanceH/state-lookup`
+`go get github.com/LanceH/state-lookup`
 
 # Usage
 
